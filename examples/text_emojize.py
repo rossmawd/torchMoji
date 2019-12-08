@@ -2,7 +2,6 @@
 
 """ Use torchMoji to predict emojis from a single text input
 """
-
 from __future__ import print_function, division, unicode_literals
 import example_helper
 import json
@@ -31,33 +30,35 @@ EMOJIS = ":joy: :unamused: :weary: :sob: :heart_eyes: \
 :angry: :no_good: :muscle: :facepunch: :purple_heart: \
 :sparkling_heart: :blue_heart: :grimacing: :sparkles:".split(' ')
 
-def top_elements(array, k):
-    ind = np.argpartition(array, -k)[-k:]
-    return ind[np.argsort(array[ind])][::-1]
+def test():
 
-if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('--text', type=str, required=True, help="Input text to emojize")
-    argparser.add_argument('--maxlen', type=int, default=30, help="Max length of input text")
-    args = argparser.parse_args()
+  def top_elements(array, k):
+      ind = np.argpartition(array, -k)[-k:]
+      return ind[np.argsort(array[ind])][::-1]
 
-    # Tokenizing using dictionary
-    with open(VOCAB_PATH, 'r') as f:
-        vocabulary = json.load(f)
+  if __name__ == "__main__":
+      argparser = argparse.ArgumentParser()
+      argparser.add_argument('--text', type=str, required=True, help="Input text to emojize")
+      argparser.add_argument('--maxlen', type=int, default=30, help="Max length of input text")
+      args = argparser.parse_args()
 
-    st = SentenceTokenizer(vocabulary, args.maxlen)
+      # Tokenizing using dictionary
+      with open(VOCAB_PATH, 'r') as f:
+          vocabulary = json.load(f)
 
-    # Loading model
-    model = torchmoji_emojis(PRETRAINED_PATH)
-    # Running predictions
-    tokenized, _, _ = st.tokenize_sentences([args.text])
-    # Get sentence probability
-    prob = model(tokenized)[0]
+      st = SentenceTokenizer(vocabulary, args.maxlen)
 
-    # Top emoji id
-    emoji_ids = top_elements(prob, 5)
+      # Loading model
+      model = torchmoji_emojis(PRETRAINED_PATH)
+      # Running predictions
+      tokenized, _, _ = st.tokenize_sentences([args.text])
+      # Get sentence probability
+      prob = model(tokenized)[0]
 
-    # map to emojis
-    emojis = map(lambda x: EMOJIS[x], emoji_ids)
+      # Top emoji id
+      emoji_ids = top_elements(prob, 5)
 
-    print(emoji.emojize("{} {}".format(args.text,' '.join(emojis)), use_aliases=True))
+      # map to emojis
+      emojis = map(lambda x: EMOJIS[x], emoji_ids)
+
+      print(emoji.emojize("{} {}".format(args.text,' '.join(emojis)), use_aliases=True))
